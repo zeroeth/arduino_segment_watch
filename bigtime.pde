@@ -5,21 +5,37 @@ boolean display_active = true;
 int button_down_time;
 int button_up_time;
 boolean button_down = false;
+int last_button_value;
 
 
 void read_side_button() {
-  if(digitalRead(2) == LOW){
-    button_down_time = millis();
+  int button_value = digitalRead(2);
+
+  boolean value_changed = false;
+
+  if(last_button_value != button_value) {
+    value_changed = true;
+  }
+
+  if(button_value == LOW) {
+    if(value_changed) {
+      button_down_time = millis();
+    }
     button_down = true;
   }
   else {
-    button_up_time = millis();
+    if(value_changed) {
+      button_up_time = millis();
+    }
     button_down = false; 
   }
+
+  last_button_value = button_value;
 }
 
 
 void setup() {                
+  delay(5000);
   segment_setup();
   
   pinMode(2, INPUT);
@@ -50,7 +66,6 @@ ISR(TIMER2_OVF_vect)    //Timer 2 overflow interrupt handler
 
 
 void loop() {
-  delay(100); // does this save energy?
   // TODO add real sleep routine
   
   read_side_button(); 
@@ -59,11 +74,14 @@ void loop() {
     display_active = true;
   }
 
+  if(button_down && millis() - button_down_time > 2000) {
+    increment_time(20);
+  }
+
   if(!button_down && millis() - button_up_time > 2000) {
     display_active = false;
   }
-  //    increment_time(20);
-   
+
   if(display_active) {
     time_to_buffer();
     displayBuffer();
