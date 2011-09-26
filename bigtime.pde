@@ -15,19 +15,24 @@ void read_side_button() {
 
   if(last_button_value != button_value) {
     value_changed = true;
+    Serial.println("change");
   }
 
   if(button_value == LOW) {
     if(value_changed) {
       button_down_time = millis();
+      button_down = true;
+      button_up_time = 0;
+      Serial.println("DOWN");
     }
-    button_down = true;
   }
   else {
     if(value_changed) {
       button_up_time = millis();
+      button_down = false; 
+      button_down_time = 0;
+      Serial.println("UP");
     }
-    button_down = false; 
   }
 
   last_button_value = button_value;
@@ -54,6 +59,7 @@ void setup() {
 
   //SMCR = 0x03;    //use power-save mode when we sleep
   sei();          //enable all interrupts
+  Serial.begin(9600);
 }
 
 
@@ -74,11 +80,11 @@ void loop() {
     display_active = true;
   }
 
-  if(button_down && millis() - button_down_time > 2000) {
+  if(button_down && button_up_time == 0 && (millis() - button_down_time > 2000)) {
     increment_time(20);
   }
 
-  if(!button_down && millis() - button_up_time > 2000) {
+  if(!button_down && button_down_time == 0 && (millis() - button_up_time > 2000)) {
     display_active = false;
   }
 
