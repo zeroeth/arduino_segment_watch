@@ -5,7 +5,7 @@ boolean second_mark = HIGH;
 int hours = 11;
 int minutes = 30;
 int seconds = 0;
-
+boolean display_active = false;
 
 void time_to_buffer() {
   time_array[0] =   hours / 10;

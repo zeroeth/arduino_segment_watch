@@ -11,5 +11,6 @@ extern boolean second_mark;
 extern int hours;
 extern int minutes;
 extern int seconds;
+extern boolean display_active;
 
 #endif 
